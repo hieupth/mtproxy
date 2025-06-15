@@ -1,0 +1,32 @@
+networks:
+  mtproxy-network:
+    driver: bridge
+
+services:
+  mtproxy:
+    image: hieupth/mtproxy
+    container_name: mtproxy
+    restart: always
+    # Required for WireGuard and network operations
+    privileged: true
+    networks:
+      - mtproxy-network
+    ports:
+      - 7432:7432
+      - 7433:8888
+    volumes:
+      - ./data:/data
+      - ~/secrets/wgcf/wgcf-profile.conf:/etc/wireguard/wgcf.conf
+    devices:
+      - /dev/net/tun
+    cap_add: 
+      - NET_ADMIN
+    # Logging
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    # Security options
+    security_opt:
+      - no-new-privileges:true
